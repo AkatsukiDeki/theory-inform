@@ -138,7 +138,15 @@ def solve_n_events(shape, probs):
 
 
 def main():
-    filename = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).parent / "example_2d_dependent.txt"
+    if len(sys.argv) > 1:
+        filename = Path(sys.argv[1])
+    else:
+        raw = input("Введите имя файла (Enter — example_2d_dependent.txt): ").strip()
+        name = raw or "example_2d_dependent.txt"
+        filename = Path(name)
+        if not filename.exists():
+            filename = Path(__file__).parent / name
+
     shape, probs = read_ensemble(filename)
     print(f"Файл: {filename.name}\n" + "-" * 40)
     solve_two_events(shape, probs) if len(shape) == 2 else solve_n_events(shape, probs)
