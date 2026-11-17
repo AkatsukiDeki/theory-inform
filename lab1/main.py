@@ -8,7 +8,7 @@ EPS = 1e-7
 
 
 def _flatten(node):
-    if isinstance(node, (int, float)):
+    if isinstance(node, (int, float)) and not isinstance(node, bool):
         return (), [float(node)]
     if not isinstance(node, list) or not node:
         raise ValueError("Некорректный вложенный список.")
@@ -80,13 +80,16 @@ def solve_two_events(shape, probs):
     print(f"H(X) = {hx:.6f} бит, H(Y) = {hy:.6f} бит, H(X,Y) = {hxy:.6f} бит\n")
 
     print("Частные условные энтропии:")
-    hy_x = sum(px[i] * entropy([probs[i * cols + j] / px[i] for j in range(cols)]) for i in range(rows) if px[i] > 0)
+    hy_x = 0.0
     for i in range(rows):
         h_part = entropy([probs[i * cols + j] / px[i] for j in range(cols)]) if px[i] > 0 else 0.0
+        hy_x += px[i] * h_part
         print(f"  H(Y | x{i + 1}) = {h_part:.6f} бит")
-    hx_y = sum(py[j] * entropy([probs[i * cols + j] / py[j] for i in range(rows)]) for j in range(cols) if py[j] > 0)
+
+    hx_y = 0.0
     for j in range(cols):
         h_part = entropy([probs[i * cols + j] / py[j] for i in range(rows)]) if py[j] > 0 else 0.0
+        hx_y += py[j] * h_part
         print(f"  H(X | y{j + 1}) = {h_part:.6f} бит")
 
     print(f"\nH(Y | X) = {hy_x:.6f} бит\nH(X | Y) = {hx_y:.6f} бит\nI(X, Y)  = {max(0.0, hx + hy - hxy):.6f} бит")
